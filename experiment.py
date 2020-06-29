@@ -11,7 +11,7 @@ from Define import *
 from metric import *
 from models.networks import *
 from models.res18 import resnet18
-from networks import *
+from models.networks import *
 from paint import *
 from torch.utils.data import DataLoader, Dataset
 from train import *
@@ -37,9 +37,10 @@ def experiment(embedding_model, n_way=2, k_shot=5, test_shots=15, dataset_name='
     test_acc = []
     last_acc = 0
 
-    name = str(n_way+" way "+k_shot+" shot " +
-               str(time.asctime(time.localtime(time.time()))))
-    os.mkdir(name)
+    # + str(time.asctime(time.localtime(time.time())))
+    name = str(n_way)+" way "+str(k_shot)+" shot "
+    if not os.path.exists(name):
+        os.mkdir(name)
 
     dataset = FewShotClass(
         dataset_name, PATH[dataset_name], k_shot, n_way, test_shots, 1)
@@ -54,26 +55,27 @@ def experiment(embedding_model, n_way=2, k_shot=5, test_shots=15, dataset_name='
         trainloader = copy.deepcopy(trainloadero)
 
         FSDataloader.get_Classify()
-        testloadero = DataLoader(FSDataloader, batch_size=10)
+        testloadero = DataLoader(FSDataloader, batch_size=20)
 
         testloader = copy.deepcopy(testloadero)
         train_loss_per_task = []
         train_acc_per_task = []
         #模型开始训练
-        # for epoch in range(epoch_num):
-        print("第{0}个任务".format(cls))
-        train_loss, train_acc, emb = train(
-            siamese, mnet, trainloader, loss, optimizer, cls, device)
-        train_loss_per_task.append(train_loss)
-        train_acc_per_task.append(train_acc)
+        for epoch in range(epoch_num):
+            print("第{0}个任务".format(cls))
+            train_loss, train_acc = train(
+                siamese, mnet, trainloader, loss, optimizer, epoch, device)
+            train_loss_per_task.append(train_loss)
+            train_acc_per_task.append(train_acc)
 
-        ftest_loss, ftest_acc = test(siamese, mnet, testloader, loss, device)
-        print('任务{0}测试准确率{1}'.format(cls, ftest_acc))
-        Define.save_model(ftest_acc, last_acc, cls, siamese,
-                          './name/siamese.pkl', mnet, './name/metric.pkl')
-        # print('test_acc %f' % ftest_acc)
-        test_loss.append(ftest_loss)
-        test_acc.append(ftest_acc)
+            ftest_loss, ftest_acc = test(
+                siamese, mnet, testloader, loss, device)
+            print('任务{0}测试准确率{1}'.format(cls, ftest_acc))
+            Define.save_model(ftest_acc, last_acc, cls, siamese,
+                              './{0}/siamese.pkl'.format(name), mnet, './{0}/metric.pkl'.format(name))
+            # print('test_acc %f' % ftest_acc)
+            test_loss.append(ftest_loss)
+            test_acc.append(ftest_acc)
         avg_train_loss.append(sum(train_loss_per_task) /
                               len(train_acc_per_task))
         avg_train_acc.append(sum(train_acc_per_task) / len(train_acc_per_task))
@@ -119,8 +121,9 @@ def experiment(embedding_model, n_way=2, k_shot=5, test_shots=15, dataset_name='
 # dataset = FewShotClass(
 #     dataset_name, PATH[dataset_name], k_shot, n_way, test_shots, 1)
     best_model = SiameseNet(embedding_model).to(device)
-    best_model.load_state_dict(torch.load("./name/siamese.pkl"))
-    best_metric = torch.load("./name/metric.pkl").to(device)
+    best_model.load_state_dict(torch.load("./{0}/siamese.pkl".format(name)))
+    best_metric = MNet(64).to(device)
+    best_metric.load_state_dict(torch.load("./{0}/metric.pkl".format(name)))
     for cls in range(20):
         # mnet.reset_parameters()
         # siamese.reset()
@@ -138,18 +141,18 @@ def experiment(embedding_model, n_way=2, k_shot=5, test_shots=15, dataset_name='
         train_loss_per_task = []
         train_acc_per_task = []
         #模型开始训练
-        # for epoch in range(epoch_num):
-        print("第{0}个任务".format(cls))
-        train_loss, train_acc, emb = train(
-            best_model, best_metric, trainloader, loss, optimizer, cls, device)
-        train_loss_per_task.append(train_loss)
-        train_acc_per_task.append(train_acc)
+        for epoch in range(20):
+            print("第{0}个任务".format(cls))
+            train_loss, train_acc = train(
+                best_model, best_metric, trainloader, loss, optimizer, epoch, device)
+            train_loss_per_task.append(train_loss)
+            train_acc_per_task.append(train_acc)
 
-        ftest_loss, ftest_acc = test(
-            best_model, best_metric, testloader, loss, device)
-        print('任务{0}测试准确率{1}'.format(cls, ftest_acc))
-        test_loss.append(ftest_loss)
-        test_acc.append(ftest_acc)
+            ftest_loss, ftest_acc = test(
+                best_model, best_metric, testloader, loss, device)
+            print('任务{0}测试准确率{1}'.format(cls, ftest_acc))
+            test_loss.append(ftest_loss)
+            test_acc.append(ftest_acc)
         avg_train_loss.append(sum(train_loss_per_task) /
                               len(train_acc_per_task))
         avg_train_acc.append(sum(train_acc_per_task) / len(train_acc_per_task))
