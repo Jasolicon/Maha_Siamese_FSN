@@ -1,12 +1,12 @@
 import os
 import torch
 import time
-PATH={'omniglot':'E:/DataSets/omniglot/',
-      'miniimagenet':'E:/DataSets/miniimagenet/',
-      'tieredimagenet':'E:/DataSets/tieredimagenet/'}
-# PATH={'omniglot':'/home/ljy/DataSets/omniglot/',
-#       'miniimagenet':'/home/ljy/DataSets/miniimagenet/',
-#       'tieredimagenet':'/home/ljy/DataSets/tieredimagenet/'}
+# PATH={'omniglot':'E:/DataSets/omniglot/',
+#       'miniimagenet':'E:/DataSets/miniimagenet/',
+#       'tieredimagenet':'E:/DataSets/tieredimagenet/'}
+PATH={'omniglot':'/home/ljy/DataSets/omniglot/',
+      'miniimagenet':'/home/ljy/DataSets/miniimagenet/',
+      'tieredimagenet':'/home/ljy/DataSets/tieredimagenet/'}
 ROOT=os.getcwd()
 def train_by_GPU(gpu = '0'):
       # gpu = "0"  # which GPU to use

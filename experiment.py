@@ -49,8 +49,8 @@ def experiment(embedding_model, n_way=2, k_shot=5, test_shots=15, dataset_name='
         # siamese.reset()
         tp = TaskPaired(batch["train"])
         tpdl = DataLoader(tp, batch_size=20, shuffle=True)
-        tpv = TaskPaired(batch["test"])
-        tpvdl = DataLoader(tpv, batch_size=20, shuffle=True)
+        # tpv = TaskPaired(batch["test"])
+        # tpvdl = DataLoader(tpv, batch_size=20, shuffle=True)
 
         train_loss_per_task = []
         train_acc_per_task = []
@@ -62,14 +62,14 @@ def experiment(embedding_model, n_way=2, k_shot=5, test_shots=15, dataset_name='
             train_loss_per_task.append(train_loss)
             train_acc_per_task.append(train_acc)
 
-            ftest_loss, ftest_acc = test(
-                siamese, mnet, tpvdl, loss, device)
-            print('任务{0}测试准确率{1}'.format(i, ftest_acc))
-            Define.save_model(ftest_acc, last_acc, i, siamese,
-                              './{0}/siamese.pkl'.format(name), mnet, './{0}/metric.pkl'.format(name))
+        train_loss, train_acc, ftest_loss, ftest_acc = test(
+            embednet, mnet, batch['test'], batch['train'], loss, 5, device)
+        print('任务{0}测试准确率{1}'.format(i, ftest_acc))
+        Define.save_model(ftest_acc, last_acc, i, siamese,
+                          './{0}/siamese.pkl'.format(name), mnet, './{0}/metric.pkl'.format(name))
 
-            test_loss.append(ftest_loss)
-            test_acc.append(ftest_acc)
+        test_loss.append(ftest_loss)
+        test_acc.append(ftest_acc)
         avg_train_loss.append(sum(train_loss_per_task) /
                               len(train_acc_per_task))
         avg_train_acc.append(sum(train_acc_per_task) / len(train_acc_per_task))
@@ -119,8 +119,8 @@ def experiment(embedding_model, n_way=2, k_shot=5, test_shots=15, dataset_name='
         # siamese.reset()
         mttp = TaskPaired(batch["train"])
         mttpdl=DataLoader(mttp,shuffle=True)
-        mttpv = TaskPaired(batch["test"])
-        mttpvdl=DataLoader(mttpv,shuffle=True)
+        # mttpv = TaskPaired(batch["test"])
+        # mttpvdl=DataLoader(mttpv,shuffle=True)
         train_loss_per_task = []
         train_acc_per_task = []
         #模型开始训练
@@ -128,14 +128,16 @@ def experiment(embedding_model, n_way=2, k_shot=5, test_shots=15, dataset_name='
             print("第{0}个任务".format(i))
             train_loss, train_acc = train(
                 best_model, best_metric, mttpdl, loss, optimizer, epoch, device)
-            train_loss_per_task.append(train_loss)
-            train_acc_per_task.append(train_acc)
+            # train_loss_per_task.append(train_loss)
+            # train_acc_per_task.append(train_acc)
 
-            ftest_loss, ftest_acc = test(
-                best_model, best_metric, mttpvdl, loss, device)
-            print('任务{0}测试准确率{1}'.format(i, ftest_acc))
-            test_loss.append(ftest_loss)
-            test_acc.append(ftest_acc)
+        train_loss, train_acc, ftest_loss, ftest_acc = test(
+            best_model, best_metric, batch['test'],batch['train'], loss,5, device)
+        train_loss_per_task.append(train_loss)
+        train_acc_per_task.append(train_acc)
+        print('任务{0}测试准确率{1}'.format(i, ftest_acc))
+        test_loss.append(ftest_loss)
+        test_acc.append(ftest_acc)
         avg_train_loss.append(sum(train_loss_per_task) /
                               len(train_acc_per_task))
         avg_train_acc.append(sum(train_acc_per_task) / len(train_acc_per_task))

@@ -10,7 +10,7 @@ import math
 import os
 
 class FewShotClass:
-    def __init__(self, dataset_name, folder, num_shots=5, num_ways=5, test_shots=15, batch_size=20, download=False, dataloader_shuffle=True, num_workers=0,**kwargs):
+    def __init__(self, dataset_name, folder, num_shots=5, num_ways=5, test_shots=15, batch_size=20, download=False, dataloader_shuffle=False, num_workers=0,**kwargs):
         datasetnamedict = {'omniglot': omniglot,
                            'miniimagenet': miniimagenet, 'tieredimagenet': tieredimagenet}
         dataset=datasetnamedict[dataset_name]
@@ -65,18 +65,28 @@ class TaskPaired(Dataset):
 
 
 if __name__ == "__main__":
+    # a=torch.Tensor([1,2,3,4,5])
+    # b=torch.Tensor([5,4,3,2,1])
+    # c = torch.eq(a,b).float()
+    # print(c)
     print("start")
     import Define
     import paint
     # dataset=FewShotClass("omniglot",Define.PATH["omniglot"],5,2,5,1)
-    dataset=FewShotClass("miniimagenet",Define.PATH["miniimagenet"],5,2,5,1)
+    dataset=FewShotClass("miniimagenet",Define.PATH["miniimagenet"],5,5,5,1)
     dl = dataset.train_dataloader
     for i,batch in enumerate(dl):
         f,l=batch['train']
-        # print(f.type,f.shape)
-        ff=f.view(-1,*f.shape[2:])
-        # print(ff.shape)
-        paint.paint_pics(ff,'task'+str(i))
+        # tp = TaskPaired(batch["train"])
+        # tpdl = DataLoader(tp, batch_size=20, shuffle=True)
+        # a=torch.Tensor()
+        # for j,b in enumerate(tpdl):
+        #     ff=b['image_0']#.view(-1,*a.shape[2:])
+        #     fd=b['image_1']#.view(-1,*a.shape[2:])
+        #     print(ff.shape)
+        #     paint.paint_pics(ff,'task0{0}{1}'.format(i,j))
+        #     paint.paint_pics(fd,'task1{0}{1}'.format(i,j))
+        print(l)
         # for j,b in enumerate(tpdl):
         #     print(b['label_0'],b['label_1'])
         #

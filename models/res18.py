@@ -87,9 +87,10 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block=BasicBlock, layers=[2, 2, 2, 2], zero_init_residual=False):
+    def __init__(self, block=BasicBlock, layers=[2, 2, 2, 2], zero_init_residual=False,**kwargs):
         super(ResNet, self).__init__()
         self.inplanes = 64
+        self.inchannel = kwargs['inchannel'] if 'inchannel' in kwargs else 3
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64)

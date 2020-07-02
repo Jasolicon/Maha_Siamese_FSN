@@ -1,6 +1,5 @@
-
+import matplotlib.pyplot as plt
 from math import *
-from datasets import *
 def paint_pics(data,name):
     fig=plt.figure()
     l=len(data)

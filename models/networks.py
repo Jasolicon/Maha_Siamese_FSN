@@ -106,9 +106,9 @@ class SiameseNet(nn.Module):
         self.embedding_net = embedding_net
 
     def forward(self, x1, x2):
-        output1, emb1 = self.embedding_net(x1)
-        output2, emb2 = self.embedding_net(x2)
-        return (output1, output2),(emb1,emb2)
+        output1 = self.embedding_net(x1)
+        output2 = self.embedding_net(x2)
+        return (output1, output2)
 
     def get_embedding(self, x):
         return self.embedding_net(x)

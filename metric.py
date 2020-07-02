@@ -28,7 +28,7 @@ class MNet(nn.Module):
         return out
 
 
-def my_knn(distances, train_labels, query_labels, same_set, k, class_num, log_path, write_log):
+def my_knn(distances, train_labels, query_labels, same_set, k, class_num):
     """                     My KNN Algorithm
 
     :param distances:       [q * t] train-query distances
@@ -51,9 +51,9 @@ def my_knn(distances, train_labels, query_labels, same_set, k, class_num, log_pa
     with torch.no_grad():
 
         # KNN
-        if write_log:
-            with open(logpath, mode='a', encoding='utf-8') as f:
-                print('Distances:', file=f)
+        # if write_log:
+        #     with open(logpath, mode='a', encoding='utf-8') as f:
+        #         print('Distances:', file=f)
 
         for i in range(ct_q):
             distances_cur = {}
@@ -82,9 +82,9 @@ def my_knn(distances, train_labels, query_labels, same_set, k, class_num, log_pa
         acc_record = torch.eq(result.long(), query_labels.long())
         acc = float(acc_record.sum()) / ct_q
 
-        if write_log:
-            with open(logpath, mode='a', encoding='utf-8') as f:
-                print('Prediction result:\n', result, '\n', file=f)
+        # if write_log:
+        #     with open(logpath, mode='a', encoding='utf-8') as f:
+        #         print('Prediction result:\n', result, '\n', file=f)
 
     return acc
 
